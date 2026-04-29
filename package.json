@@ -121,6 +121,7 @@
       "code8": [
         {
           "id": "code8.chatView",
+          "type": "webview",
           "name": "Agent"
         }
       ]
