@@ -15,7 +15,7 @@ The Omnistation host needs:
 * npm 9.2.0 or newer
 * Network access to npm registry
 
-The package tool `@vscode/vsce` is pinned in `package.json` so packaging stays compatible with the current Omnistation Node runtime. Node 20+ remains preferred for future release automation.
+The package tool `@vscode/vsce` is pinned in `package.json` so packaging stays compatible with the current Omnistation Node runtime. `cheerio` is overridden to a Node-18-compatible release to avoid the `undici@7` runtime path. Node 20+ remains preferred for future release automation.
 
 == Build Commands
 

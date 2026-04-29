@@ -107,5 +107,8 @@
     "@types/vscode": "^1.95.0",
     "@vscode/vsce": "2.32.0",
     "typescript": "^5.8.3"
+  },
+  "overrides": {
+    "cheerio": "1.0.0-rc.12"
   }
 }
