@@ -17,7 +17,7 @@ export function getConfig(): Code8Config {
   return {
     baseUrl: trimTrailingSlash(config.get('ngc.baseUrl', 'https://integrate.api.nvidia.com/v1')),
     model: config.get('ngc.model', 'meta/llama-3.3-70b-instruct'),
-    modelCatalogUrl: config.get('ngc.modelCatalogUrl', 'https://docs.api.nvidia.com/nim/reference/llm-apis'),
+    modelCatalogUrl: config.get('ngc.modelCatalogUrl', 'https://docs.api.nvidia.com/nim/reference/models-1'),
     modelCatalogCacheMinutes: config.get('ngc.modelCatalogCacheMinutes', 60),
     maxSteps: config.get('agent.maxSteps', 8),
     autoApproveRead: config.get('agent.autoApproveRead', true),

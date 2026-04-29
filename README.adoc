@@ -59,8 +59,8 @@ The Code8 view also has `Model`, `Sync`, `Stop`, and `New` controls for changing
 | Model ID sent to chat completions.
 
 | `code8.ngc.modelCatalogUrl`
-| `https://docs.api.nvidia.com/nim/reference/llm-apis`
-| Official NVIDIA LLM API catalog page used when the provider model endpoint is unavailable.
+| `https://docs.api.nvidia.com/nim/reference/models-1`
+| Official NVIDIA hosted NIM catalog page used when the provider model endpoint is unavailable.
 
 | `code8.ngc.modelCatalogCacheMinutes`
 | `60`

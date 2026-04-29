@@ -74,8 +74,8 @@
         },
         "code8.ngc.modelCatalogUrl": {
           "type": "string",
-          "default": "https://docs.api.nvidia.com/nim/reference/llm-apis",
-          "description": "Official NVIDIA LLM API catalog page used as a fallback when the provider model endpoint is unavailable."
+          "default": "https://docs.api.nvidia.com/nim/reference/models-1",
+          "description": "Official NVIDIA hosted NIM model catalog page used as a fallback when the provider model endpoint is unavailable."
         },
         "code8.ngc.modelCatalogCacheMinutes": {
           "type": "number",

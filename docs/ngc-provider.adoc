@@ -29,13 +29,13 @@ Change it through `code8.ngc.model` when another NVIDIA-hosted NIM is preferred.
 
 == Model Discovery
 
-Code8 does not keep a fixed list of model IDs. It discovers models in this order:
+Code8 does not keep a fixed list of model IDs. It discovers hosted NIM model IDs in this order:
 
 1. `GET {code8.ngc.baseUrl}/models` using the configured NGC API key when available.
-2. The official NVIDIA LLM API catalog page configured by `code8.ngc.modelCatalogUrl`.
+2. The official NVIDIA hosted model catalog page configured by `code8.ngc.modelCatalogUrl`.
 3. The currently configured model ID if both discovery paths are unavailable.
 
-The fallback page is used because NVIDIA documents the hosted LLM API models there and the catalog changes over time.
+The fallback page is used because NVIDIA documents hosted model categories there and the catalog changes over time. The coding agent still needs a model that supports chat-style text generation; non-chat NIMs can be selected for future tool families but may not satisfy `/chat/completions`.
 
 Use either the command palette or the Code8 view to select models:
 
