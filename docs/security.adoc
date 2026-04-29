@@ -1,0 +1,34 @@
+= Security Model
+:toc:
+:sectnums:
+
+== Defaults
+
+Code8 is intentionally conservative:
+
+* API keys are stored in VS Code SecretStorage.
+* Reads and file listings are limited to the open workspace.
+* File writes ask for approval by default.
+* Terminal commands are disabled by default.
+* Terminal commands, when enabled, still ask for approval.
+
+== Workspace Boundary
+
+All file paths are resolved from the first opened workspace folder. Paths that escape that folder are rejected.
+
+== Command Execution
+
+The agent can only start terminal commands when:
+
+* `code8.agent.allowTerminalCommands` is enabled.
+* The user approves the exact command in a VS Code modal prompt.
+
+The MVP starts commands in a visible terminal instead of hiding execution. This keeps the user in control and makes command output inspectable.
+
+== Known Limitations
+
+* The prompt-based JSON action protocol is practical for an MVP but less robust than provider-native tool calling.
+* There is no persistent task checkpointing yet.
+* There is no diff preview UI yet; write approval currently happens before the write.
+* The extension does not yet capture terminal output back into the model context.
+

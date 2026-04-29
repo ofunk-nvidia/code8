@@ -1,0 +1,112 @@
+{
+  "name": "code8",
+  "displayName": "Code8",
+  "description": "A VS Code coding-agent extension powered by NVIDIA NGC / NIM chat completions.",
+  "version": "0.1.0",
+  "publisher": "ofunk-nvidia",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ofunk-nvidia/code8.git"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:code8.chatView",
+    "onCommand:code8.openChat",
+    "onCommand:code8.setNgcApiKey",
+    "onCommand:code8.clearNgcApiKey"
+  ],
+  "main": "./out/extension.js",
+  "scripts": {
+    "build": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "check": "tsc -p ./ --noEmit",
+    "package": "vsce package --no-dependencies"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "code8.openChat",
+        "title": "Code8: Open Agent Chat",
+        "category": "Code8"
+      },
+      {
+        "command": "code8.setNgcApiKey",
+        "title": "Code8: Set NVIDIA NGC API Key",
+        "category": "Code8"
+      },
+      {
+        "command": "code8.clearNgcApiKey",
+        "title": "Code8: Clear NVIDIA NGC API Key",
+        "category": "Code8"
+      }
+    ],
+    "configuration": {
+      "title": "Code8",
+      "properties": {
+        "code8.ngc.baseUrl": {
+          "type": "string",
+          "default": "https://integrate.api.nvidia.com/v1",
+          "description": "OpenAI-compatible base URL for NVIDIA NIM / NGC chat completions."
+        },
+        "code8.ngc.model": {
+          "type": "string",
+          "default": "meta/llama-3.3-70b-instruct",
+          "description": "NVIDIA NIM model ID used by the coding agent."
+        },
+        "code8.agent.maxSteps": {
+          "type": "number",
+          "default": 8,
+          "minimum": 1,
+          "maximum": 30,
+          "description": "Maximum model/tool iterations for one user request."
+        },
+        "code8.agent.autoApproveRead": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow the agent to read and list workspace files without prompting."
+        },
+        "code8.agent.requireApprovalForWrites": {
+          "type": "boolean",
+          "default": true,
+          "description": "Ask before creating or changing workspace files."
+        },
+        "code8.agent.allowTerminalCommands": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow the agent to propose terminal commands. Commands still require approval."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "code8",
+          "title": "Code8",
+          "icon": "resources/code8.svg"
+        }
+      ]
+    },
+    "views": {
+      "code8": [
+        {
+          "id": "code8.chatView",
+          "name": "Agent"
+        }
+      ]
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@types/vscode": "^1.95.0",
+    "@vscode/vsce": "^3.2.2",
+    "typescript": "^5.8.3"
+  }
+}
+

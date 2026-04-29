@@ -1,0 +1,73 @@
+= Code8
+:toc:
+:sectnums:
+
+Code8 is a VS Code extension prototype for an AI coding agent similar in spirit to Cline. It uses NVIDIA NGC / NIM as an OpenAI-compatible model provider and keeps secrets out of the repository.
+
+== Current Scope
+
+The first milestone is a compact, reviewable MVP:
+
+* VS Code Activity Bar view with a chat composer.
+* NVIDIA NGC / NIM chat-completions provider.
+* Agent loop with structured actions for listing files, reading files, writing files, replacing text, and proposing terminal commands.
+* Human approval before workspace writes and terminal commands.
+* AsciiDoc documentation for architecture, provider configuration, security, and Omnistation build flow.
+
+== Quick Start
+
+[source,powershell]
+----
+npm install
+npm run build
+----
+
+Open this folder in VS Code and press `F5` to launch an Extension Development Host.
+
+Set the API key through the command palette:
+
+[source,text]
+----
+Code8: Set NVIDIA NGC API Key
+----
+
+The key is stored in VS Code SecretStorage. You can also set `NGC_API_KEY` in the extension host environment for local experimentation.
+
+== Configuration
+
+[cols="1,2,2",options="header"]
+|===
+| Setting | Default | Purpose
+
+| `code8.ngc.baseUrl`
+| `https://integrate.api.nvidia.com/v1`
+| OpenAI-compatible NVIDIA NIM base URL.
+
+| `code8.ngc.model`
+| `meta/llama-3.3-70b-instruct`
+| Model ID sent to chat completions.
+
+| `code8.agent.maxSteps`
+| `8`
+| Maximum model/tool iterations per request.
+
+| `code8.agent.autoApproveRead`
+| `true`
+| Allows workspace file listing and reads without prompting.
+
+| `code8.agent.requireApprovalForWrites`
+| `true`
+| Prompts before file creation or modification.
+
+| `code8.agent.allowTerminalCommands`
+| `false`
+| Enables proposed terminal commands; each command still requires approval.
+|===
+
+== Documentation
+
+* link:docs/architecture.adoc[Architecture]
+* link:docs/ngc-provider.adoc[NVIDIA NGC Provider]
+* link:docs/security.adoc[Security Model]
+* link:docs/omnistation-build.adoc[Omnistation Build Flow]
+

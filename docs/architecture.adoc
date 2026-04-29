@@ -1,0 +1,68 @@
+= Code8 Architecture
+:toc:
+:sectnums:
+
+== Goal
+
+Code8 starts as a VS Code extension rather than a full editor fork. That keeps the first build small enough to test while still delivering the important user experience: a coding agent embedded in the editor with workspace tools.
+
+== Components
+
+[cols="1,2",options="header"]
+|===
+| Component | Responsibility
+
+| `src/extension.ts`
+| Extension activation, command registration, and SecretStorage wiring.
+
+| `src/webview/*`
+| Activity Bar chat view, message bridge, and VS Code-themed UI.
+
+| `src/ngcProvider.ts`
+| OpenAI-compatible streaming chat-completions client for NVIDIA NGC / NIM.
+
+| `src/agent/*`
+| Prompt contract, action parsing, and model/tool iteration loop.
+
+| `src/tools/workspaceTools.ts`
+| Workspace file operations and terminal command proposal execution.
+|===
+
+== Agent Loop
+
+[mermaid]
+....
+flowchart TD
+  User[User prompt in Code8 view] --> Agent[Agent prompt + conversation state]
+  Agent --> NGC[NVIDIA NGC / NIM chat completions]
+  NGC --> Parse[Parse JSON action]
+  Parse -->|read/list| Tools[Workspace tools]
+  Parse -->|write/command| Approval[VS Code approval prompt]
+  Approval --> Tools
+  Tools --> Result[Tool result appended to context]
+  Result --> Agent
+  Parse -->|respond| Done[Final response]
+....
+
+== Action Protocol
+
+The model is instructed to emit exactly one JSON object per step. This avoids assuming model-side tool calling support and works with OpenAI-compatible chat endpoints.
+
+[source,json]
+----
+{"action":"read_file","path":"src/extension.ts","say":"I need the activation code before editing."}
+----
+
+Supported actions:
+
+* `respond`
+* `list_files`
+* `read_file`
+* `write_file`
+* `replace_in_file`
+* `run_command`
+
+== Why This Shape
+
+A full VS Code clone would require maintaining an editor distribution, extension host, update channel, and product branding. The extension-first shape validates the AI coding-agent experience quickly and leaves room for a later VSCodium/Electron distribution when requirements are clearer.
+

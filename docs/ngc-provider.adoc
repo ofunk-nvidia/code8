@@ -1,0 +1,46 @@
+= NVIDIA NGC Provider
+:toc:
+:sectnums:
+
+== Provider Contract
+
+Code8 talks to NVIDIA NGC / NIM through the OpenAI-compatible chat-completions API.
+
+[source,text]
+----
+POST https://integrate.api.nvidia.com/v1/chat/completions
+Authorization: Bearer <NGC_API_KEY>
+Content-Type: application/json
+Accept: text/event-stream
+----
+
+The default base URL is configurable through `code8.ngc.baseUrl`.
+
+== Model
+
+The default model is:
+
+[source,text]
+----
+meta/llama-3.3-70b-instruct
+----
+
+Change it through `code8.ngc.model` when another NVIDIA-hosted NIM is preferred.
+
+== Secret Handling
+
+Use the command palette command:
+
+[source,text]
+----
+Code8: Set NVIDIA NGC API Key
+----
+
+The key is stored in VS Code SecretStorage. The repository intentionally does not contain `.env` files or API keys.
+
+== References
+
+* NVIDIA NIM LLM API reference: https://docs.api.nvidia.com/nim/reference/llm-apis
+* NVIDIA chat completions endpoint: https://docs.api.nvidia.com/nim/reference/create_chat_completion_v1_chat_completions_post
+* NGC API key documentation: https://docs.nvidia.com/ngc/ngc-catalog-user-guide/index.html#ngc-api-keys
+

@@ -1,0 +1,40 @@
+= Omnistation Build Flow
+:toc:
+:sectnums:
+
+== Purpose
+
+Builds and packaging checks should run on Omnistation so the repository has a reproducible remote validation path.
+
+== Expected Remote Setup
+
+The Omnistation host needs:
+
+* Git
+* Node.js 20 or newer
+* npm 10 or newer
+* Network access to npm registry
+
+== Build Commands
+
+[source,bash]
+----
+git clone https://github.com/ofunk-nvidia/code8.git
+cd code8
+npm install
+npm run build
+----
+
+== Package Command
+
+[source,bash]
+----
+npm run package
+----
+
+The package command creates a `.vsix` extension package.
+
+== CI Direction
+
+The next step is to add a GitHub Actions workflow once the repository policy is clear. Omnistation remains the preferred manual build and release validation environment.
+
