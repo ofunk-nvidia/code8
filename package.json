@@ -2,7 +2,7 @@
   "name": "code8",
   "displayName": "Code8",
   "description": "A VS Code coding-agent extension powered by NVIDIA NGC / NIM chat completions.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "ofunk-nvidia",
   "license": "MIT",
   "repository": {
