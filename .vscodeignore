@@ -4,7 +4,8 @@ src/**
 docs/**
 node_modules/**
 .env
+*.zip
+*.vsix
 .gitignore
 tsconfig.json
 *.ts
-

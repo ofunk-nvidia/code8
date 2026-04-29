@@ -2,8 +2,8 @@ node_modules/
 out/
 dist/
 *.vsix
+*.zip
 .vscode-test/
 .env
 .DS_Store
 npm-debug.log*
-

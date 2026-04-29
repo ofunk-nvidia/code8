@@ -11,9 +11,11 @@ Builds and packaging checks should run on Omnistation so the repository has a re
 The Omnistation host needs:
 
 * Git
-* Node.js 20 or newer
-* npm 10 or newer
+* Node.js 18.19.1 or newer for the current MVP build
+* npm 9.2.0 or newer
 * Network access to npm registry
+
+The package tool `@vscode/vsce` is pinned in `package.json` so packaging stays compatible with the current Omnistation Node runtime. Node 20+ remains preferred for future release automation.
 
 == Build Commands
 
@@ -37,4 +39,3 @@ The package command creates a `.vsix` extension package.
 == CI Direction
 
 The next step is to add a GitHub Actions workflow once the repository policy is clear. Omnistation remains the preferred manual build and release validation environment.
-
