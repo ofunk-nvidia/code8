@@ -116,8 +116,8 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
     }
 
     .actions {
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
 
@@ -128,7 +128,8 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
       border-radius: 4px;
       padding: 8px 10px;
       cursor: pointer;
-      min-width: 72px;
+      min-width: 0;
+      min-height: 32px;
     }
 
     button.secondary {
@@ -153,7 +154,11 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
       <textarea id="prompt" placeholder="Ask Code8 to inspect, edit, or explain this workspace"></textarea>
       <div class="actions">
         <button type="submit">Send</button>
+        <button class="secondary" type="button" id="stop">Stop</button>
+        <button class="secondary" type="button" id="model">Model</button>
         <button class="secondary" type="button" id="key">Key</button>
+        <button class="secondary" type="button" id="reset">New</button>
+        <button class="secondary" type="button" id="refresh">Sync</button>
       </div>
     </form>
   </main>
@@ -164,6 +169,10 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
     const form = document.getElementById('composer');
     const prompt = document.getElementById('prompt');
     const key = document.getElementById('key');
+    const model = document.getElementById('model');
+    const refresh = document.getElementById('refresh');
+    const stop = document.getElementById('stop');
+    const reset = document.getElementById('reset');
 
     function append(type, text) {
       if (type === 'status') {
@@ -197,6 +206,22 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
       vscode.postMessage({ type: 'setApiKey' });
     });
 
+    model.addEventListener('click', () => {
+      vscode.postMessage({ type: 'selectModel' });
+    });
+
+    refresh.addEventListener('click', () => {
+      vscode.postMessage({ type: 'refreshModels' });
+    });
+
+    stop.addEventListener('click', () => {
+      vscode.postMessage({ type: 'stop' });
+    });
+
+    reset.addEventListener('click', () => {
+      vscode.postMessage({ type: 'reset' });
+    });
+
     vscode.postMessage({ type: 'ready' });
   </script>
 </body>
@@ -211,4 +236,3 @@ function getNonce(): string {
   }
   return value;
 }
-

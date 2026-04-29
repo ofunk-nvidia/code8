@@ -21,7 +21,7 @@ export class CodingAgent {
 
   public constructor(private readonly options: CodingAgentOptions) {}
 
-  public async run(userRequest: string): Promise<void> {
+  public async run(userRequest: string, signal?: AbortSignal): Promise<void> {
     this.messages.push({
       role: 'user',
       content: userRequest
@@ -30,6 +30,11 @@ export class CodingAgent {
     const tools = new WorkspaceTools(this.options.config);
 
     for (let step = 1; step <= this.options.config.maxSteps; step += 1) {
+      if (signal?.aborted) {
+        this.options.emit({ kind: 'assistant', text: 'Stopped.' });
+        return;
+      }
+
       this.options.emit({ kind: 'status', text: `Step ${step}/${this.options.config.maxSteps}` });
 
       let streamed = '';
@@ -37,6 +42,7 @@ export class CodingAgent {
         config: this.options.config,
         apiKey: this.options.apiKey,
         messages: this.messages,
+        signal,
         onToken: (token) => {
           streamed += token;
           this.options.emit({ kind: 'token', text: token });
@@ -69,4 +75,3 @@ export class CodingAgent {
     });
   }
 }
-

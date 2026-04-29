@@ -27,6 +27,24 @@ meta/llama-3.3-70b-instruct
 
 Change it through `code8.ngc.model` when another NVIDIA-hosted NIM is preferred.
 
+== Model Discovery
+
+Code8 does not keep a fixed list of model IDs. It discovers models in this order:
+
+1. `GET {code8.ngc.baseUrl}/models` using the configured NGC API key when available.
+2. The official NVIDIA LLM API catalog page configured by `code8.ngc.modelCatalogUrl`.
+3. The currently configured model ID if both discovery paths are unavailable.
+
+The fallback page is used because NVIDIA documents the hosted LLM API models there and the catalog changes over time.
+
+Use either the command palette or the Code8 view to select models:
+
+[source,text]
+----
+Code8: Select NVIDIA NIM Model
+Code8: Refresh NVIDIA NIM Model Catalog
+----
+
 == Secret Handling
 
 Use the command palette command:
@@ -41,6 +59,6 @@ The key is stored in VS Code SecretStorage. The repository intentionally does no
 == References
 
 * NVIDIA NIM LLM API reference: https://docs.api.nvidia.com/nim/reference/llm-apis
+* NVIDIA hosted model categories: https://docs.api.nvidia.com/nim/reference/models-1
 * NVIDIA chat completions endpoint: https://docs.api.nvidia.com/nim/reference/create_chat_completion_v1_chat_completions_post
 * NGC API key documentation: https://docs.nvidia.com/ngc/ngc-catalog-user-guide/index.html#ngc-api-keys
-

@@ -21,6 +21,9 @@ Code8 starts as a VS Code extension rather than a full editor fork. That keeps t
 | `src/ngcProvider.ts`
 | OpenAI-compatible streaming chat-completions client for NVIDIA NGC / NIM.
 
+| `src/nimCatalog.ts`
+| Dynamic NIM model discovery from the provider `/models` endpoint with official NVIDIA docs fallback.
+
 | `src/agent/*`
 | Prompt contract, action parsing, and model/tool iteration loop.
 
@@ -37,8 +40,10 @@ flowchart TD
   Agent --> NGC[NVIDIA NGC / NIM chat completions]
   NGC --> Parse[Parse JSON action]
   Parse -->|read/list| Tools[Workspace tools]
+  Parse -->|diagnostics/current file| Editor[VS Code editor state]
   Parse -->|write/command| Approval[VS Code approval prompt]
   Approval --> Tools
+  Editor --> Result
   Tools --> Result[Tool result appended to context]
   Result --> Agent
   Parse -->|respond| Done[Final response]
@@ -58,11 +63,18 @@ Supported actions:
 * `respond`
 * `list_files`
 * `read_file`
+* `read_active_file`
+* `list_diagnostics`
 * `write_file`
 * `replace_in_file`
 * `run_command`
 
+== Session Model
+
+The webview keeps an agent session alive across multiple user messages. This gives the agent conversational continuity for a task, while `New` resets the session when the user wants a clean context. `Stop` aborts the in-flight model request through `AbortController`.
+
+Changing the selected NIM model resets the session because model-specific behavior and context should not silently mix.
+
 == Why This Shape
 
 A full VS Code clone would require maintaining an editor distribution, extension host, update channel, and product branding. The extension-first shape validates the AI coding-agent experience quickly and leaves room for a later VSCodium/Electron distribution when requirements are clearer.
-

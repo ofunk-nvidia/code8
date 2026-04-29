@@ -11,6 +11,12 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('code8.openChat', async () => {
       await vscode.commands.executeCommand('workbench.view.extension.code8');
     }),
+    vscode.commands.registerCommand('code8.selectNimModel', async () => {
+      await provider.selectNimModel();
+    }),
+    vscode.commands.registerCommand('code8.refreshNimModels', async () => {
+      await provider.refreshModelCatalog();
+    }),
     vscode.commands.registerCommand('code8.setNgcApiKey', async () => {
       const value = await vscode.window.showInputBox({
         title: 'Set NVIDIA NGC API Key',
@@ -38,4 +44,3 @@ export function activate(context: vscode.ExtensionContext): void {
 export function deactivate(): void {
   // VS Code disposes subscriptions registered in activate.
 }
-

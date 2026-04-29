@@ -19,6 +19,8 @@
   "activationEvents": [
     "onView:code8.chatView",
     "onCommand:code8.openChat",
+    "onCommand:code8.selectNimModel",
+    "onCommand:code8.refreshNimModels",
     "onCommand:code8.setNgcApiKey",
     "onCommand:code8.clearNgcApiKey"
   ],
@@ -34,6 +36,16 @@
       {
         "command": "code8.openChat",
         "title": "Code8: Open Agent Chat",
+        "category": "Code8"
+      },
+      {
+        "command": "code8.selectNimModel",
+        "title": "Code8: Select NVIDIA NIM Model",
+        "category": "Code8"
+      },
+      {
+        "command": "code8.refreshNimModels",
+        "title": "Code8: Refresh NVIDIA NIM Model Catalog",
         "category": "Code8"
       },
       {
@@ -59,6 +71,18 @@
           "type": "string",
           "default": "meta/llama-3.3-70b-instruct",
           "description": "NVIDIA NIM model ID used by the coding agent."
+        },
+        "code8.ngc.modelCatalogUrl": {
+          "type": "string",
+          "default": "https://docs.api.nvidia.com/nim/reference/llm-apis",
+          "description": "Official NVIDIA LLM API catalog page used as a fallback when the provider model endpoint is unavailable."
+        },
+        "code8.ngc.modelCatalogCacheMinutes": {
+          "type": "number",
+          "default": 60,
+          "minimum": 0,
+          "maximum": 1440,
+          "description": "How long Code8 caches the NIM model catalog. Set to 0 to refresh every time."
         },
         "code8.agent.maxSteps": {
           "type": "number",

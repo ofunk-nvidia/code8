@@ -15,6 +15,10 @@ export class WorkspaceTools {
         return this.listFiles(action.glob ?? '**/*');
       case 'read_file':
         return this.readFile(required(action.path, 'path'));
+      case 'read_active_file':
+        return this.readActiveFile();
+      case 'list_diagnostics':
+        return this.listDiagnostics();
       case 'write_file':
         return this.writeFile(required(action.path, 'path'), action.content ?? '');
       case 'replace_in_file':
@@ -47,6 +51,54 @@ export class WorkspaceTools {
     const content = new TextDecoder().decode(bytes.slice(0, MAX_READ_BYTES));
     const truncated = bytes.byteLength > MAX_READ_BYTES ? '\n\n[File truncated for context window.]' : '';
     return content + truncated;
+  }
+
+  private async readActiveFile(): Promise<string> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      return 'No active editor is open.';
+    }
+
+    const folder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+    if (!folder) {
+      return 'The active file is not inside the current workspace.';
+    }
+
+    if (!this.config.autoApproveRead && !(await confirm(`Allow Code8 to read ${vscode.workspace.asRelativePath(editor.document.uri)}?`))) {
+      return 'User rejected reading the active file.';
+    }
+
+    const text = editor.document.getText();
+    const content = text.length > MAX_READ_BYTES ? `${text.slice(0, MAX_READ_BYTES)}\n\n[File truncated for context window.]` : text;
+    const selection = editor.selection.isEmpty ? '' : `\n\n[Selection]\n${editor.document.getText(editor.selection)}`;
+    return `[Active file: ${vscode.workspace.asRelativePath(editor.document.uri)}]\n${content}${selection}`;
+  }
+
+  private async listDiagnostics(): Promise<string> {
+    const folder = vscode.workspace.workspaceFolders?.[0];
+    if (!folder) {
+      return 'Open a workspace folder before listing diagnostics.';
+    }
+
+    const results: string[] = [];
+    for (const [uri, diagnostics] of vscode.languages.getDiagnostics()) {
+      if (!isInsideWorkspace(folder.uri.fsPath, uri.fsPath)) {
+        continue;
+      }
+
+      for (const diagnostic of diagnostics) {
+        const line = diagnostic.range.start.line + 1;
+        const character = diagnostic.range.start.character + 1;
+        const severity = vscode.DiagnosticSeverity[diagnostic.severity];
+        const source = diagnostic.source ? ` [${diagnostic.source}]` : '';
+        results.push(`${vscode.workspace.asRelativePath(uri)}:${line}:${character} ${severity}${source}: ${diagnostic.message}`);
+        if (results.length >= 100) {
+          return `${results.join('\n')}\n\n[Diagnostics truncated at 100 entries.]`;
+        }
+      }
+    }
+
+    return results.join('\n') || 'No workspace diagnostics reported by VS Code.';
   }
 
   private async writeFile(relativePath: string, content: string): Promise<string> {
@@ -123,4 +175,3 @@ async function confirm(message: string): Promise<boolean> {
   const result = await vscode.window.showWarningMessage(message, { modal: true }, 'Allow');
   return result === 'Allow';
 }
-

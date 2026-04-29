@@ -8,6 +8,7 @@ Code8 is intentionally conservative:
 
 * API keys are stored in VS Code SecretStorage.
 * Reads and file listings are limited to the open workspace.
+* The active editor and diagnostics can be read by the agent as context.
 * File writes ask for approval by default.
 * Terminal commands are disabled by default.
 * Terminal commands, when enabled, still ask for approval.
@@ -15,6 +16,8 @@ Code8 is intentionally conservative:
 == Workspace Boundary
 
 All file paths are resolved from the first opened workspace folder. Paths that escape that folder are rejected.
+
+The `read_active_file` tool only returns content when the active editor belongs to the current workspace.
 
 == Command Execution
 
@@ -31,4 +34,3 @@ The MVP starts commands in a visible terminal instead of hiding execution. This 
 * There is no persistent task checkpointing yet.
 * There is no diff preview UI yet; write approval currently happens before the write.
 * The extension does not yet capture terminal output back into the model context.
-

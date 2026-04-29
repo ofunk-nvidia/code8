@@ -12,6 +12,7 @@ export interface ChatCompletionOptions {
   readonly apiKey: string;
   readonly messages: readonly ChatMessage[];
   readonly onToken?: (token: string) => void;
+  readonly signal?: AbortSignal;
 }
 
 interface NvidiaChatCompletionChunk {
@@ -42,7 +43,8 @@ export async function createChatCompletion(options: ChatCompletionOptions): Prom
       'Content-Type': 'application/json',
       Accept: 'text/event-stream'
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: options.signal
   });
 
   if (!response.ok) {
@@ -99,4 +101,3 @@ async function readServerSentEvents(body: ReadableStream<Uint8Array>, onToken?: 
 
   return fullText;
 }
-

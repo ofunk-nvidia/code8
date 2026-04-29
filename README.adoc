@@ -10,7 +10,9 @@ The first milestone is a compact, reviewable MVP:
 
 * VS Code Activity Bar view with a chat composer.
 * NVIDIA NGC / NIM chat-completions provider.
+* Dynamic NVIDIA NIM model selection with provider discovery and official NVIDIA docs fallback.
 * Agent loop with structured actions for listing files, reading files, writing files, replacing text, and proposing terminal commands.
+* Persistent agent sessions with stop/reset controls.
 * Human approval before workspace writes and terminal commands.
 * AsciiDoc documentation for architecture, provider configuration, security, and Omnistation build flow.
 
@@ -33,6 +35,15 @@ Code8: Set NVIDIA NGC API Key
 
 The key is stored in VS Code SecretStorage. You can also set `NGC_API_KEY` in the extension host environment for local experimentation.
 
+Select a hosted NIM model through:
+
+[source,text]
+----
+Code8: Select NVIDIA NIM Model
+----
+
+The Code8 view also has `Model`, `Sync`, `Stop`, and `New` controls for changing models, refreshing the catalog, cancelling a run, and starting a fresh agent session.
+
 == Configuration
 
 [cols="1,2,2",options="header"]
@@ -46,6 +57,14 @@ The key is stored in VS Code SecretStorage. You can also set `NGC_API_KEY` in th
 | `code8.ngc.model`
 | `meta/llama-3.3-70b-instruct`
 | Model ID sent to chat completions.
+
+| `code8.ngc.modelCatalogUrl`
+| `https://docs.api.nvidia.com/nim/reference/llm-apis`
+| Official NVIDIA LLM API catalog page used when the provider model endpoint is unavailable.
+
+| `code8.ngc.modelCatalogCacheMinutes`
+| `60`
+| Cache duration for the discovered NIM model list.
 
 | `code8.agent.maxSteps`
 | `8`
@@ -70,4 +89,3 @@ The key is stored in VS Code SecretStorage. You can also set `NGC_API_KEY` in th
 * link:docs/ngc-provider.adoc[NVIDIA NGC Provider]
 * link:docs/security.adoc[Security Model]
 * link:docs/omnistation-build.adoc[Omnistation Build Flow]
-

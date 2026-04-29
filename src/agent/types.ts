@@ -1,4 +1,12 @@
-export type AgentActionType = 'respond' | 'list_files' | 'read_file' | 'write_file' | 'replace_in_file' | 'run_command';
+export type AgentActionType =
+  | 'respond'
+  | 'list_files'
+  | 'read_file'
+  | 'read_active_file'
+  | 'list_diagnostics'
+  | 'write_file'
+  | 'replace_in_file'
+  | 'run_command';
 
 export interface AgentAction {
   readonly action: AgentActionType;
@@ -17,4 +25,3 @@ export interface AgentEvent {
 }
 
 export type AgentEventHandler = (event: AgentEvent) => void;
-
