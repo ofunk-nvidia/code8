@@ -1,10 +1,14 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import { AgentAction } from '../agent/types';
 import { Code8Config } from '../config';
 
 const MAX_READ_BYTES = 60_000;
 const MAX_LIST_RESULTS = 200;
+const MAX_COMMAND_OUTPUT = 40_000;
+const execAsync = promisify(exec);
 
 export class WorkspaceTools {
   public constructor(private readonly config: Code8Config) {}
@@ -102,7 +106,7 @@ export class WorkspaceTools {
   }
 
   private async writeFile(relativePath: string, content: string): Promise<string> {
-    if (this.config.requireApprovalForWrites && !(await confirm(`Allow Code8 to write ${relativePath}?`))) {
+    if (this.config.requireApprovalForWrites && !(await approveWrite(relativePath, content))) {
       return `User rejected writing ${relativePath}.`;
     }
 
@@ -113,10 +117,6 @@ export class WorkspaceTools {
   }
 
   private async replaceInFile(relativePath: string, oldText: string, newText: string): Promise<string> {
-    if (this.config.requireApprovalForWrites && !(await confirm(`Allow Code8 to edit ${relativePath}?`))) {
-      return `User rejected editing ${relativePath}.`;
-    }
-
     const uri = resolveWorkspaceUri(relativePath);
     const original = new TextDecoder().decode(await vscode.workspace.fs.readFile(uri));
     if (!original.includes(oldText)) {
@@ -124,6 +124,10 @@ export class WorkspaceTools {
     }
 
     const updated = original.replace(oldText, newText);
+    if (this.config.requireApprovalForWrites && !(await approveWrite(relativePath, updated))) {
+      return `User rejected editing ${relativePath}.`;
+    }
+
     await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(updated));
     return `Edited ${relativePath}.`;
   }
@@ -137,10 +141,26 @@ export class WorkspaceTools {
       return `User rejected command: ${command}`;
     }
 
-    const terminal = vscode.window.createTerminal('Code8 Agent');
-    terminal.show();
-    terminal.sendText(command);
-    return `Started command in terminal: ${command}`;
+    const folder = vscode.workspace.workspaceFolders?.[0];
+    if (!folder) {
+      return 'Open a workspace folder before running commands.';
+    }
+
+    try {
+      const { stdout, stderr } = await execAsync(command, {
+        cwd: folder.uri.fsPath,
+        shell: process.platform === 'win32' ? 'powershell.exe' : undefined,
+        timeout: 120_000,
+        maxBuffer: 1024 * 1024
+      });
+      return formatCommandOutput(command, stdout, stderr);
+    } catch (error) {
+      if (isExecError(error)) {
+        return formatCommandOutput(command, error.stdout ?? '', error.stderr ?? '', error.code);
+      }
+
+      throw error;
+    }
   }
 }
 
@@ -174,4 +194,91 @@ function required(value: string | undefined, name: string): string {
 async function confirm(message: string): Promise<boolean> {
   const result = await vscode.window.showWarningMessage(message, { modal: true }, 'Allow');
   return result === 'Allow';
+}
+
+async function approveWrite(relativePath: string, proposedContent: string): Promise<boolean> {
+  const review = 'Review Diff';
+  const allow = 'Allow';
+  const result = await vscode.window.showWarningMessage(
+    `Allow Code8 to write ${relativePath}?`,
+    { modal: true },
+    review,
+    allow
+  );
+
+  if (result === review) {
+    await showDiffPreview(relativePath, proposedContent);
+    const reviewed = await vscode.window.showWarningMessage(
+      `Apply the proposed changes to ${relativePath}?`,
+      { modal: true },
+      allow
+    );
+    return reviewed === allow;
+  }
+
+  return result === allow;
+}
+
+async function showDiffPreview(relativePath: string, proposedContent: string): Promise<void> {
+  const workspaceUri = resolveWorkspaceUri(relativePath);
+  const language = languageForPath(relativePath);
+  const proposedDoc = await vscode.workspace.openTextDocument({
+    content: proposedContent,
+    language
+  });
+  const leftUri = await existingOrEmptyDocument(workspaceUri, language);
+  await vscode.commands.executeCommand('vscode.diff', leftUri, proposedDoc.uri, `Code8 Diff: ${relativePath}`);
+}
+
+async function existingOrEmptyDocument(uri: vscode.Uri, language: string): Promise<vscode.Uri> {
+  try {
+    await vscode.workspace.fs.stat(uri);
+    return uri;
+  } catch {
+    const emptyDoc = await vscode.workspace.openTextDocument({
+      content: '',
+      language
+    });
+    return emptyDoc.uri;
+  }
+}
+
+function languageForPath(relativePath: string): string {
+  const ext = path.extname(relativePath).slice(1).toLowerCase();
+  const map: Record<string, string> = {
+    ts: 'typescript',
+    tsx: 'typescriptreact',
+    js: 'javascript',
+    jsx: 'javascriptreact',
+    json: 'json',
+    md: 'markdown',
+    adoc: 'asciidoc',
+    py: 'python',
+    ps1: 'powershell',
+    sh: 'shellscript'
+  };
+  return map[ext] ?? 'plaintext';
+}
+
+function formatCommandOutput(command: string, stdout: string, stderr: string, code = 0): string {
+  const combined = [`Command: ${command}`, `Exit code: ${code}`];
+  if (stdout.trim()) {
+    combined.push(`stdout:\n${stdout.trim()}`);
+  }
+  if (stderr.trim()) {
+    combined.push(`stderr:\n${stderr.trim()}`);
+  }
+
+  const output = combined.join('\n\n');
+  return output.length > MAX_COMMAND_OUTPUT ? `${output.slice(0, MAX_COMMAND_OUTPUT)}\n\n[Command output truncated.]` : output;
+}
+
+interface ExecError extends Error {
+  readonly code?: number;
+  readonly stdout?: string;
+  readonly stderr?: string;
+}
+
+function isExecError(error: unknown): error is ExecError {
+  return error instanceof Error && ('stdout' in error || 'stderr' in error || 'code' in error);
 }

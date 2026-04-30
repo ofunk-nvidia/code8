@@ -22,6 +22,8 @@ export interface AgentAction {
 export interface AgentEvent {
   readonly kind: 'status' | 'assistant' | 'tool' | 'error' | 'token';
   readonly text: string;
+  readonly title?: string;
+  readonly status?: 'pending' | 'approved' | 'rejected' | 'running' | 'done' | 'failed';
 }
 
 export type AgentEventHandler = (event: AgentEvent) => void;

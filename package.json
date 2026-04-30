@@ -2,7 +2,7 @@
   "name": "code8",
   "displayName": "Code8",
   "description": "A VS Code coding-agent extension powered by NVIDIA NGC / NIM chat completions.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "ofunk-nvidia",
   "license": "MIT",
   "repository": {
@@ -19,6 +19,7 @@
   "activationEvents": [
     "onView:code8.chatView",
     "onCommand:code8.openChat",
+    "onCommand:code8.toggleAgentMode",
     "onCommand:code8.selectNimModel",
     "onCommand:code8.refreshNimModels",
     "onCommand:code8.setNgcApiKey",
@@ -36,6 +37,11 @@
       {
         "command": "code8.openChat",
         "title": "Code8: Open Agent Chat",
+        "category": "Code8"
+      },
+      {
+        "command": "code8.toggleAgentMode",
+        "title": "Code8: Toggle Plan/Act Mode",
         "category": "Code8"
       },
       {
@@ -90,6 +96,15 @@
           "minimum": 1,
           "maximum": 30,
           "description": "Maximum model/tool iterations for one user request."
+        },
+        "code8.agent.mode": {
+          "type": "string",
+          "enum": [
+            "plan",
+            "act"
+          ],
+          "default": "plan",
+          "description": "Plan mode can inspect and propose. Act mode can mutate workspace state through approval gates."
         },
         "code8.agent.autoApproveRead": {
           "type": "boolean",

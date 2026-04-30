@@ -6,10 +6,13 @@ export interface Code8Config {
   readonly modelCatalogUrl: string;
   readonly modelCatalogCacheMinutes: number;
   readonly maxSteps: number;
+  readonly mode: AgentMode;
   readonly autoApproveRead: boolean;
   readonly requireApprovalForWrites: boolean;
   readonly allowTerminalCommands: boolean;
 }
+
+export type AgentMode = 'plan' | 'act';
 
 export function getConfig(): Code8Config {
   const config = vscode.workspace.getConfiguration('code8');
@@ -20,6 +23,7 @@ export function getConfig(): Code8Config {
     modelCatalogUrl: config.get('ngc.modelCatalogUrl', 'https://docs.api.nvidia.com/nim/reference/models-1'),
     modelCatalogCacheMinutes: config.get('ngc.modelCatalogCacheMinutes', 60),
     maxSteps: config.get('agent.maxSteps', 8),
+    mode: config.get<AgentMode>('agent.mode', 'plan'),
     autoApproveRead: config.get('agent.autoApproveRead', true),
     requireApprovalForWrites: config.get('agent.requireApprovalForWrites', true),
     allowTerminalCommands: config.get('agent.allowTerminalCommands', false)

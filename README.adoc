@@ -44,6 +44,25 @@ Code8: Select NVIDIA NIM Model
 
 The Code8 view also has `Model`, `Sync`, `Stop`, and `New` controls for changing models, refreshing the catalog, cancelling a run, and starting a fresh agent session.
 
+== What Code8 Can Do Today
+
+Code8 is now structured as a small agent runtime rather than a plain chat box:
+
+* `Plan` mode inspects files, diagnostics, and active editor context without mutating the workspace.
+* `Act` mode can request file edits and commands, still behind approval gates.
+* File writes can be reviewed in VS Code's diff editor before applying.
+* Commands are executed with captured stdout/stderr returned to the agent.
+* Tool calls are shown as cards with running/done/rejected status.
+
+Use the `Mode` button or command palette command to switch modes:
+
+[source,text]
+----
+Code8: Toggle Plan/Act Mode
+----
+
+This is still an early agent. It does not yet have MCP, browser automation, task history, checkpoints, or native VS Code Chat Participant integration.
+
 == Configuration
 
 [cols="1,2,2",options="header"]
@@ -70,6 +89,10 @@ The Code8 view also has `Model`, `Sync`, `Stop`, and `New` controls for changing
 | `8`
 | Maximum model/tool iterations per request.
 
+| `code8.agent.mode`
+| `plan`
+| `plan` can inspect and propose; `act` can request approved writes and commands.
+
 | `code8.agent.autoApproveRead`
 | `true`
 | Allows workspace file listing and reads without prompting.
@@ -86,6 +109,7 @@ The Code8 view also has `Model`, `Sync`, `Stop`, and `New` controls for changing
 == Documentation
 
 * link:docs/architecture.adoc[Architecture]
+* link:docs/design.adoc[Agent Design]
 * link:docs/ngc-provider.adoc[NVIDIA NGC Provider]
 * link:docs/security.adoc[Security Model]
 * link:docs/omnistation-build.adoc[Omnistation Build Flow]

@@ -27,8 +27,11 @@ Code8 starts as a VS Code extension rather than a full editor fork. That keeps t
 | `src/agent/*`
 | Prompt contract, action parsing, and model/tool iteration loop.
 
+| `src/tools/toolRegistry.ts`
+| Tool metadata, Plan/Act mode gates, and dispatch boundary.
+
 | `src/tools/workspaceTools.ts`
-| Workspace file operations and terminal command proposal execution.
+| Workspace file operations, diff review, diagnostics, and captured command execution.
 |===
 
 == Agent Loop
@@ -74,6 +77,12 @@ Supported actions:
 The webview keeps an agent session alive across multiple user messages. This gives the agent conversational continuity for a task, while `New` resets the session when the user wants a clean context. `Stop` aborts the in-flight model request through `AbortController`.
 
 Changing the selected NIM model resets the session because model-specific behavior and context should not silently mix.
+
+== Plan And Act
+
+Code8 starts in Plan mode. In Plan mode, write and command tools are blocked by the runtime even if a model asks for them. This is intentionally redundant with the prompt instruction; the runtime gate is the safety boundary.
+
+Act mode enables mutating tools, but each write or command still goes through a user approval gate. File changes can be reviewed in VS Code's diff editor before being applied.
 
 == Why This Shape
 

@@ -11,6 +11,9 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand('code8.openChat', async () => {
       await vscode.commands.executeCommand('workbench.view.extension.code8');
     }),
+    vscode.commands.registerCommand('code8.toggleAgentMode', async () => {
+      await provider.toggleAgentMode();
+    }),
     vscode.commands.registerCommand('code8.selectNimModel', async () => {
       await provider.selectNimModel();
     }),

@@ -5,7 +5,7 @@ import { getNimModels, NimModel } from '../nimCatalog';
 import { renderChatHtml } from './html';
 
 interface WebviewMessage {
-  readonly type: 'ready' | 'send' | 'setApiKey' | 'selectModel' | 'refreshModels' | 'stop' | 'reset';
+  readonly type: 'ready' | 'send' | 'setApiKey' | 'selectModel' | 'refreshModels' | 'toggleMode' | 'stop' | 'reset';
   readonly text?: string;
 }
 
@@ -37,6 +37,15 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
 
   public refreshStatus(): void {
     void this.postStatus();
+  }
+
+  public async toggleAgentMode(): Promise<void> {
+    const current = getConfig().mode;
+    const next = current === 'plan' ? 'act' : 'plan';
+    await vscode.workspace.getConfiguration('code8').update('agent.mode', next, vscode.ConfigurationTarget.Global);
+    this.resetAgentSession();
+    await this.post('assistant', `Switched to ${next.toUpperCase()} mode.`);
+    await this.postStatus();
   }
 
   public async selectNimModel(): Promise<void> {
@@ -109,6 +118,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       return;
     }
 
+    if (message.type === 'toggleMode') {
+      await this.toggleAgentMode();
+      return;
+    }
+
     if (message.type === 'stop') {
       this.abortController?.abort();
       await this.post('assistant', 'Stop requested.');
@@ -164,11 +178,11 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
   private async postStatus(): Promise<void> {
     const config = getConfig();
     const hasKey = Boolean(await this.getApiKey());
-    await this.post('status', `${config.model} | NGC key: ${hasKey ? 'set' : 'missing'} | ${this.running ? 'working' : 'ready'}`);
+    await this.post('status', `${config.mode.toUpperCase()} | ${config.model} | NGC key: ${hasKey ? 'set' : 'missing'} | ${this.running ? 'working' : 'ready'}`);
   }
 
-  private async post(type: string, text: string): Promise<void> {
-    await this.view?.webview.postMessage({ type, text });
+  private async post(type: string, text: string, title?: string, status?: string): Promise<void> {
+    await this.view?.webview.postMessage({ type, text, title, status });
   }
 
   private getAgent(apiKey: string): CodingAgent {
@@ -177,6 +191,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
       baseUrl: config.baseUrl,
       model: config.model,
       maxSteps: config.maxSteps,
+      mode: config.mode,
       autoApproveRead: config.autoApproveRead,
       requireApprovalForWrites: config.requireApprovalForWrites,
       allowTerminalCommands: config.allowTerminalCommands
@@ -187,7 +202,7 @@ export class ChatViewProvider implements vscode.WebviewViewProvider {
         config,
         apiKey,
         emit: (event) => {
-          void this.post(event.kind, event.text);
+          void this.post(event.kind, event.text, event.title, event.status);
         }
       });
       this.agentIdentity = identity;

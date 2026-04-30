@@ -74,6 +74,26 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
       line-height: 1.45;
     }
 
+    .message-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--vscode-descriptionForeground);
+      text-transform: uppercase;
+    }
+
+    .message-status {
+      border: 1px solid var(--vscode-badge-background);
+      border-radius: 4px;
+      padding: 1px 4px;
+      color: var(--vscode-badge-foreground);
+      background: var(--vscode-badge-background);
+      text-transform: none;
+    }
+
     .user {
       background: var(--vscode-inputValidation-infoBackground);
       border-color: var(--vscode-inputValidation-infoBorder);
@@ -156,6 +176,7 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
         <button type="submit">Send</button>
         <button class="secondary" type="button" id="stop">Stop</button>
         <button class="secondary" type="button" id="model">Model</button>
+        <button class="secondary" type="button" id="mode">Mode</button>
         <button class="secondary" type="button" id="key">Key</button>
         <button class="secondary" type="button" id="reset">New</button>
         <button class="secondary" type="button" id="refresh">Sync</button>
@@ -170,11 +191,12 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
     const prompt = document.getElementById('prompt');
     const key = document.getElementById('key');
     const model = document.getElementById('model');
+    const mode = document.getElementById('mode');
     const refresh = document.getElementById('refresh');
     const stop = document.getElementById('stop');
     const reset = document.getElementById('reset');
 
-    function append(type, text) {
+    function append(type, text, title, messageStatus) {
       if (type === 'status') {
         status.textContent = text;
         return;
@@ -182,14 +204,28 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
 
       const el = document.createElement('article');
       el.className = 'message ' + type;
-      el.textContent = text;
+      if (title || messageStatus) {
+        const heading = document.createElement('div');
+        heading.className = 'message-title';
+        heading.textContent = title || type;
+        if (messageStatus) {
+          const statusEl = document.createElement('span');
+          statusEl.className = 'message-status';
+          statusEl.textContent = messageStatus;
+          heading.appendChild(statusEl);
+        }
+        el.appendChild(heading);
+      }
+      const body = document.createElement('div');
+      body.textContent = text;
+      el.appendChild(body);
       log.appendChild(el);
       log.scrollTop = log.scrollHeight;
     }
 
     window.addEventListener('message', (event) => {
-      const { type, text } = event.data;
-      append(type, text);
+      const { type, text, title, status } = event.data;
+      append(type, text, title, status);
     });
 
     form.addEventListener('submit', (event) => {
@@ -208,6 +244,10 @@ export function renderChatHtml(webview: vscode.Webview, extensionUri: vscode.Uri
 
     model.addEventListener('click', () => {
       vscode.postMessage({ type: 'selectModel' });
+    });
+
+    mode.addEventListener('click', () => {
+      vscode.postMessage({ type: 'toggleMode' });
     });
 
     refresh.addEventListener('click', () => {

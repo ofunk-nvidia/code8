@@ -1,0 +1,149 @@
+= Code8 Agent Design
+:toc:
+:sectnums:
+
+== Why This Reset Exists
+
+The first Code8 implementation proved that a VS Code extension can call NVIDIA NGC / NIM and run a small agent loop. It was intentionally thin, but that also made the product unclear: the UI did not explain what the agent was doing, the tool system was not explicit, and the implementation did not yet reflect the strongest open-source patterns.
+
+Code8 should now evolve from a spike into a real agent runtime.
+
+== Reference Systems
+
+[cols="1,2,2",options="header"]
+|===
+| System | What Code8 Learns | What Code8 Does Differently
+
+| Cline
+| Task thread, human-in-the-loop tool approval, terminal output feedback, file diff review, MCP, browser testing, checkpoints.
+| Code8 starts narrower and optimizes provider support around NVIDIA NGC / NIM.
+
+| Continue
+| Context providers, repo-local rules, provider abstraction, source-controlled agent/check definitions.
+| Code8 keeps the interactive VS Code agent as the primary experience before adding CI agents.
+
+| Copilot Chat
+| Native VS Code chat participants, agent sessions, plan-first workflows, session management.
+| Code8 keeps an independent Webview first so it can work without Copilot service dependencies.
+|===
+
+== Product Contract
+
+Code8 is an NVIDIA NIM-powered coding agent for VS Code. It should:
+
+* Make clear what task is running.
+* Show every tool call and result.
+* Ask before workspace mutation and command execution.
+* Show diffs before file writes.
+* Feed command output and diagnostics back into the model.
+* Support a Plan mode that cannot mutate the workspace.
+* Support an Act mode that can use approved tools.
+* Keep all provider keys in VS Code SecretStorage.
+* Treat NIM model choice as provider capability metadata, not a hardcoded string.
+
+== Runtime Shape
+
+[mermaid]
+....
+flowchart TD
+  User[User task] --> Session[Agent session]
+  Session --> Prompt[System prompt + context + tool contract]
+  Prompt --> Provider[NVIDIA NGC / NIM]
+  Provider --> Parser[Action parser]
+  Parser --> Registry[Tool registry]
+  Registry --> Gate{Approval needed?}
+  Gate -->|No| Tool[Tool executor]
+  Gate -->|Yes| Approval[User approval + optional diff review]
+  Approval --> Tool
+  Tool --> Result[Tool result]
+  Result --> Session
+  Parser -->|respond| Done[Final response]
+....
+
+== Tool Registry
+
+Tools must be registered with explicit metadata:
+
+* `name`
+* `description`
+* `mode`: `plan`, `act`, or `both`
+* `approval`: `never`, `read`, `write`, or `command`
+* `mutatesWorkspace`
+* `execute(input)`
+
+This is the first structural difference from the spike. The agent should not rely on a switch statement as the long-term tool boundary.
+
+== Initial Tool Set
+
+[cols="1,1,1,2",options="header"]
+|===
+| Tool | Mode | Approval | Purpose
+
+| `list_files`
+| both
+| read
+| Discover relevant files.
+
+| `read_file`
+| both
+| read
+| Add a file to context.
+
+| `read_active_file`
+| both
+| read
+| Use the editor's current file and selection.
+
+| `list_diagnostics`
+| both
+| never
+| Inspect VS Code problems after edits or failed builds.
+
+| `write_file`
+| act
+| write
+| Create or replace a file after diff review.
+
+| `replace_in_file`
+| act
+| write
+| Apply a targeted edit after diff review.
+
+| `run_command`
+| act
+| command
+| Run approved commands and return captured output.
+|===
+
+== Modes
+
+Plan mode is for understanding, asking questions, listing files, reading files, and proposing a plan. It cannot write files or run commands.
+
+Act mode can mutate the workspace and run commands, but only through approval gates.
+
+The UI should make the active mode visible and easy to switch.
+
+== UI Direction
+
+Code8 should use task cards rather than plain log messages:
+
+* user request
+* assistant reasoning summary
+* tool request
+* approval outcome
+* tool result
+* final answer
+* error
+
+Diff review should use VS Code's diff editor rather than rendering a fake diff inside the Webview.
+
+== Roadmap
+
+1. Tool registry, mode gates, diff approval, command output capture.
+2. Task history and resume.
+3. Repo rules from `.code8/rules/*.md`.
+4. Context providers for files, folders, diagnostics, git diff, terminal output, and selected text.
+5. MCP client support.
+6. Browser automation for local app testing.
+7. Optional native VS Code Chat Participant integration.
+
