@@ -1,0 +1,32 @@
+= Code8
+:toc:
+:source-highlighter: highlight.js
+
+Code8 is a VS Code coding agent based on the open-source Cline extension, with NVIDIA NGC / NIM exposed as a first-class model provider.
+
+The current branch intentionally replaces the earlier custom Webview MVP with a Cline-based foundation. That gives Code8 a mature agent UI, approval flow, terminal integration, diff handling, task history, MCP support, and provider settings surface before adding NVIDIA-specific behavior.
+
+== What Is New In This Branch
+
+* Upstream foundation: Cline `ee1d4b4dcf6a8d8748edc624391faf91fa2e6d41`.
+* Provider: `NVIDIA NGC / NIM` appears in the provider selector.
+* Endpoint: NGC uses `https://integrate.api.nvidia.com/v1`.
+* Model selection: the provider refreshes `GET /v1/models` and shows the returned model IDs in a dropdown.
+* Build target: Code8 package metadata is rebranded while keeping upstream Cline command IDs where that reduces fork drift.
+
+== Documentation
+
+* link:docs/code8-foundation.adoc[Foundation decision]
+* link:docs/ngc-nim-provider.adoc[NVIDIA NGC / NIM provider]
+* link:docs/omnistation-code8-build.adoc[Omnistation build workflow]
+
+== Try It Locally
+
+[source,powershell]
+----
+npm run install:all
+npm run package:vsix
+----
+
+Then install the generated `code8-0.3.0.vsix` in VS Code.
+

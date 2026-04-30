@@ -1,0 +1,53 @@
+= Code8 Foundation Decision
+:toc:
+
+== Decision
+
+Code8 is now based on Cline instead of the earlier custom VS Code Webview MVP.
+
+The imported upstream baseline is:
+
+* Project: `cline/cline`
+* Commit: `ee1d4b4dcf6a8d8748edc624391faf91fa2e6d41`
+* License: Apache-2.0
+
+== Why Cline
+
+Cline already contains the hard parts that Code8 needs:
+
+* Agent task loop with plan/act behavior.
+* Human approval flow for tool use.
+* File editing and diff review.
+* Terminal command execution with user control.
+* MCP integration.
+* Webview UI that is already shaped around an agent, not a blank sidebar.
+* Existing OpenAI-compatible provider plumbing.
+
+Continue remains a useful reference for configuration ergonomics and context strategy, but Cline is closer to the expected product surface for a VS Code agent similar to Cline.
+
+GitHub Copilot Chat is useful as a UX reference inside VS Code, but it is not the primary fork base here because the goal is a standalone extension using NVIDIA NGC / NIM directly.
+
+== What Code8 Changes
+
+Code8 keeps Cline's agentic foundation and adds:
+
+* a provider entry named `NVIDIA NGC / NIM`;
+* the NVIDIA-hosted NIM endpoint `https://integrate.api.nvidia.com/v1`;
+* dynamic model discovery through the OpenAI-compatible `GET /v1/models` endpoint;
+* a model dropdown for returned NIM model IDs;
+* AsciiDoc documentation for architecture, provider behavior, and Omnistation builds.
+
+== Fork Discipline
+
+The extension still keeps several internal command IDs with the `cline.*` prefix. That is intentional for now because renaming those IDs would create a broad, noisy fork that makes future upstream merges harder.
+
+User-facing labels are rebranded where they appear in the package metadata and the provider UI. Deeper UI copy can be rebranded incrementally after the provider path builds cleanly.
+
+== Immediate Technical Path
+
+1. Keep Cline as the root extension implementation.
+2. Add Code8/NVIDIA changes as small patches.
+3. Verify local build and VSIX packaging.
+4. Verify the same build on Omnistation.
+5. Only then broaden rebranding or UX changes.
+

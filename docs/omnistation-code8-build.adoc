@@ -1,0 +1,33 @@
+= Omnistation Build Workflow
+:toc:
+
+== Requirement
+
+The Cline-based Code8 branch expects a modern Node.js runtime. Use Node.js 20.20+ or Node.js 22.22+ for dependency install, type generation, webview build, and VSIX packaging.
+
+If Omnistation is still on Node.js 18, upgrade or activate a newer Node runtime before building this branch.
+
+== Build Commands
+
+[source,bash]
+----
+npm run install:all
+npm run package:vsix
+----
+
+`npm run install:all` installs root and `webview-ui` dependencies.
+
+`npm run package:vsix` runs the Cline production package script and then creates:
+
+[source,text]
+----
+code8-0.3.0.vsix
+----
+
+== Verification Checklist
+
+* Provider selector contains `NVIDIA NGC / NIM`.
+* Selecting the provider locks Base URL to `https://integrate.api.nvidia.com/v1`.
+* Entering an NVIDIA API key enables model refresh.
+* Refreshed models appear in a dropdown.
+* Starting a task still uses the Cline approval/diff/terminal workflow.

@@ -1,0 +1,55 @@
+= NVIDIA NGC / NIM Provider
+:toc:
+
+== Scope
+
+The Code8 provider named `NVIDIA NGC / NIM` is implemented as a first-class provider alias over Cline's OpenAI-compatible handler.
+
+This is deliberate. NVIDIA-hosted NIM endpoints and self-hosted NIM microservices expose OpenAI-compatible APIs for LLM inference, so Code8 reuses the mature OpenAI-compatible streaming, tool-call, and message conversion path instead of introducing a second agent runtime.
+
+== Hosted NGC Endpoint
+
+The hosted provider uses:
+
+[source,text]
+----
+https://integrate.api.nvidia.com/v1
+----
+
+Code8 sends chat completions through the same OpenAI-compatible `/v1/chat/completions` path used by Cline's OpenAI-compatible provider.
+
+== Model Selection
+
+The provider does not hardcode a fixed model catalog.
+
+When an NVIDIA API key is entered, Code8 calls:
+
+[source,text]
+----
+GET https://integrate.api.nvidia.com/v1/models
+----
+
+The returned model IDs are de-duplicated by the existing refresh handler and shown in the provider settings dropdown. This is what allows the UI to cover the NIM catalog exposed by NGC without needing a new extension release for every model catalog change.
+
+== Self-Hosted NIM
+
+For a self-hosted NIM container or enterprise gateway, use Cline's existing `OpenAI Compatible` provider instead of the locked `NVIDIA NGC / NIM` provider, and set the base URL to the service's `/v1` endpoint.
+
+Examples:
+
+[source,text]
+----
+http://localhost:8000/v1
+https://your-enterprise-gateway.example.com/v1
+----
+
+== Required User Settings
+
+* Provider: `NVIDIA NGC / NIM`
+* API key: NVIDIA API key
+* Model ID: selected from the refreshed model dropdown
+
+== Notes
+
+The provider uses the shared `openAiApiKey`, `openAiModelId`, and `openAiModelInfo` state fields. That keeps the first integration small and compatible with Cline's existing handler. A later migration can split these into dedicated `ngcApiKey` and `ngcModelId` state fields if parallel OpenAI-compatible and NGC configurations must be preserved independently.
+
