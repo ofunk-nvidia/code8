@@ -44,7 +44,7 @@ If Omnistation cannot reach GitHub release assets, pre-seed the ripgrep cache:
 
 [source,text]
 ----
-code8-0.3.0.vsix
+code8-0.3.1.vsix
 ----
 
 == Verification Checklist

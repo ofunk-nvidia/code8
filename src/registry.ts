@@ -1,7 +1,8 @@
 import { name, publisher, version } from "../package.json"
 import { HostProvider } from "./hosts/host-provider"
 
-const prefix = name === "claude-dev" ? "cline" : name
+const commandPrefix = name === "claude-dev" || name === "code8" ? "cline" : name
+const viewPrefix = name === "code8" ? "claude-dev" : name
 
 /**
  * List of commands with the name of the extension they are registered under.
@@ -10,25 +11,25 @@ const prefix = name === "claude-dev" ? "cline" : name
  * In production, all commands are registered under "cline" for consistency.
  */
 const ClineCommands = {
-	PlusButton: prefix + ".plusButtonClicked",
-	McpButton: prefix + ".mcpButtonClicked",
-	SettingsButton: prefix + ".settingsButtonClicked",
-	HistoryButton: prefix + ".historyButtonClicked",
-	AccountButton: prefix + ".accountButtonClicked",
-	WorktreesButton: prefix + ".worktreesButtonClicked",
-	AddToChat: prefix + ".addToChat",
-	FixWithCline: prefix + ".fixWithCline",
-	ExplainCode: prefix + ".explainCode",
-	ImproveCode: prefix + ".improveCode",
-	FocusChatInput: prefix + ".focusChatInput",
-	Walkthrough: prefix + ".openWalkthrough",
-	GenerateCommit: prefix + ".generateGitCommitMessage",
-	AbortCommit: prefix + ".abortGitCommitMessage",
-	ReconstructTaskHistory: prefix + ".reconstructTaskHistory",
+	PlusButton: commandPrefix + ".plusButtonClicked",
+	McpButton: commandPrefix + ".mcpButtonClicked",
+	SettingsButton: commandPrefix + ".settingsButtonClicked",
+	HistoryButton: commandPrefix + ".historyButtonClicked",
+	AccountButton: commandPrefix + ".accountButtonClicked",
+	WorktreesButton: commandPrefix + ".worktreesButtonClicked",
+	AddToChat: commandPrefix + ".addToChat",
+	FixWithCline: commandPrefix + ".fixWithCline",
+	ExplainCode: commandPrefix + ".explainCode",
+	ImproveCode: commandPrefix + ".improveCode",
+	FocusChatInput: commandPrefix + ".focusChatInput",
+	Walkthrough: commandPrefix + ".openWalkthrough",
+	GenerateCommit: commandPrefix + ".generateGitCommitMessage",
+	AbortCommit: commandPrefix + ".abortGitCommitMessage",
+	ReconstructTaskHistory: commandPrefix + ".reconstructTaskHistory",
 	// Jupyter Notebook commands
-	JupyterGenerateCell: prefix + ".jupyterGenerateCell",
-	JupyterExplainCell: prefix + ".jupyterExplainCell",
-	JupyterImproveCell: prefix + ".jupyterImproveCell",
+	JupyterGenerateCell: commandPrefix + ".jupyterGenerateCell",
+	JupyterExplainCell: commandPrefix + ".jupyterExplainCell",
+	JupyterImproveCell: commandPrefix + ".jupyterImproveCell",
 }
 
 /**
@@ -36,7 +37,7 @@ const ClineCommands = {
  * These should match the name + view IDs defined in package.json.
  */
 const ClineViewIds = {
-	Sidebar: name + ".SidebarProvider",
+	Sidebar: viewPrefix + ".SidebarProvider",
 }
 
 /**

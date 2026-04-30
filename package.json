@@ -2,7 +2,7 @@
 	"name": "code8",
 	"displayName": "Code8",
 	"description": "Cline-based autonomous coding agent for VS Code with NVIDIA NGC / NIM as a first-class model provider.",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"icon": "assets/icons/icon.png",
 	"workspaces": [
 		".",
@@ -389,7 +389,7 @@
 		"watch:esbuild": "node esbuild.mjs --watch",
 		"watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
 		"package": "npm run check-types && npm run build:webview && npm run lint && node esbuild.mjs --production",
-		"package:vsix": "npm run package && vsce package --allow-package-secrets sendgrid --out code8-0.3.0.vsix",
+		"package:vsix": "npm run package && vsce package --allow-package-secrets sendgrid --out code8-0.3.1.vsix",
 		"protos": "node scripts/build-proto.mjs",
 		"protos-python": "node scripts/build-python-proto.mjs",
 		"download-ripgrep": "node scripts/download-ripgrep.mjs",

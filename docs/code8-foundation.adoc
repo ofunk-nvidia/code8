@@ -39,7 +39,7 @@ Code8 keeps Cline's agentic foundation and adds:
 
 == Fork Discipline
 
-The extension still keeps several internal command IDs with the `cline.*` prefix. That is intentional for now because renaming those IDs would create a broad, noisy fork that makes future upstream merges harder.
+The extension still keeps several internal command IDs with the `cline.*` prefix and the legacy sidebar view ID `claude-dev.SidebarProvider`. That is intentional for now because renaming those IDs would create a broad, noisy fork that makes future upstream merges harder and can break VS Code view registration.
 
 User-facing labels are rebranded where they appear in the package metadata and the provider UI. Deeper UI copy can be rebranded incrementally after the provider path builds cleanly.
 
@@ -50,4 +50,3 @@ User-facing labels are rebranded where they appear in the package metadata and t
 3. Verify local build and VSIX packaging.
 4. Verify the same build on Omnistation.
 5. Only then broaden rebranding or UX changes.
-

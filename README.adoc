@@ -28,5 +28,4 @@ npm run install:all
 npm run package:vsix
 ----
 
-Then install the generated `code8-0.3.0.vsix` in VS Code.
-
+Then install the generated `code8-0.3.1.vsix` in VS Code.
