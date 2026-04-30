@@ -22,7 +22,10 @@ CLAUDE.local.md
 code8-source-*.zip
 code8-cline-foundation*.zip
 code8-cline-foundation*.patch
+code8-omni-build*.zip
 omnistation-remote-dir.txt
+omnistation-build-dir.txt
+node-dist-cache/
 
 webview-ui/src/**/*.js
 webview-ui/src/**/*.js.map

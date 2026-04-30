@@ -71,8 +71,9 @@ export async function applyProviderConfig(options: ApplyProviderConfigOptions): 
 	}
 
 	// Add base URL if provided (for OpenAI-compatible providers)
-	if (baseUrl || providerId === "ngc") {
-		config.openAiBaseUrl = providerId === "ngc" ? baseUrl || ngcBaseUrl : baseUrl
+	const finalBaseUrl = providerId === "ngc" ? baseUrl || ngcBaseUrl : baseUrl
+	if (finalBaseUrl) {
+		config.openAiBaseUrl = finalBaseUrl
 	}
 
 	// Save via StateManager
